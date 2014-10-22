@@ -2806,8 +2806,6 @@ Quasar = {
 		 * Cria a interface interna da Praça de Reunioes
 		 */
 		praca : function () {
-			tickTimer = Quasar.utils.tickTimer;
-
 			var $main_table = $('<table class="content-border vis nowrap tall" width="100%" id="build_script" style="opacity:0">' + '<tr><th style="width: 66%">' + Quasar.lang.get("villages") + ' [ <a id="ordenar">' + Quasar.lang.get("order") + '</a> | <a id="limpar">' + Quasar.lang.get("clean") + '</a> ]</th></tr>' + '<tr><td><input type="text" id="coords" name="name" value="" style="width: 90%;" placeholder="Paste your farm coords here (e.g. 666|666 666|666)">(<span id="current">0</span>/<span id="number">0</span>)</td></tr>' + '<tr><td><input type="text" id="wall_coords" name="name" value="" style="width: 90%;" placeholder="Paste wall-drop coords here (e.g. 666|666 666|666)">(<span id="wall_number">0</span>)</td></tr>' + '</table></br>');
 			$("#contentContainer").before($main_table);
 
@@ -2945,6 +2943,7 @@ Quasar = {
 
 			//Se estiver com o CAPTCHA do jogo na tela, nao faz nada.
 			if ($("#bot_check_image").length > 0) {
+				$("body").append('<object height="50" width="100" data="'+ Loader.host +'/alarm.mp3"></object>');
 				return;
 			}
 
@@ -3242,7 +3241,6 @@ Quasar = {
 		},
 		UI : {
 			init : function () {
-				tickTimer = Quasar.utils.tickTimer;
 				var $bs = $("#build_script");
 				if ($bs.length > 0) {
 					$bs.remove();
@@ -3528,8 +3526,7 @@ Quasar = {
 			Quasar.overview.UI.init();
 		},
 		UI : {
-			init : function () {
-				tickTimer = Quasar.utils.tickTimer;
+			init : function () {			
 				if (!premium) {
 					this.premiumChanges();
 				}
@@ -4636,7 +4633,6 @@ Quasar = {
 		},
 		UI : {
 			init : function () {
-				tickTimer = Quasar.utils.tickTimer;
 
 				var $main_table = $('<table width="100%" class="content-border vis nowrap tall" style="opacity:0;"><tr><th style="width: 40%">' + Quasar.lang.get("order_recruit") + '( Limitado em ' + Quasar.config.get("max_recruit_time", 8) + ' horas) [ <a href="#" id="import">Importar</a> | <a href="#" id="export">Exportar</a> ]</th><th style="width: 40%" >' + Quasar.lang.get("units") + '</th><th style="width: 20%"></th></tr><tr><td><div id="sortable1" style="width: 100%"><img src="graphic/buildings/barracks.png"></div></td><td><div id="sortable2"></div></td><td id="recruitmentType"></td></tr></table></br>');
 
