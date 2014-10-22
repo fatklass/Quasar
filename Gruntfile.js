@@ -12,10 +12,20 @@ module.exports = function(grunt) {
         dest: 'build/quasar.min.js'
       }
     },
+	cssmin: {
+	  add_banner: {
+		options: {
+		  banner: '/* My minified css file */'
+		},
+		files: {
+		  'build/quasar.min.css': ['src/**/*.css']
+		}
+	  }
+	},
 	watch : {
 		scripts: {
-			files: ['src/**/*.js'],
-			tasks: ['concat', 'uglify'],
+			files: ['src/**/*.js', 'lib/**/*.js'],
+			tasks: ['concat', 'uglify', 'cssmin'],
 			options: {
 				spawn: false,
 			},
@@ -23,17 +33,21 @@ module.exports = function(grunt) {
 	},
 	concat:{
 		options: {
-			banner: "'use strict';\n",
+		  banner: "'use strict';\n",
+		  process: function(src, filepath) {
+          return '// Source: ' + filepath + '\n' +
+            src.replace(/(^|\n)[ \t]*('use strict'|"use strict");?\s*/g, '$1');
+        },
 		},
 		basic_and_extras: {
 			files: {
-				'build/quasar.js': ['src/**/*.js', "lib/**/*.js"],
-				'build/quasar.css': ['src/**/*.css']
+				'build/quasar.js': ['lib/**/*.js', 'src/**/*.js'],
 			}
 		}
 	}
   });
 
+  grunt.loadNpmTasks('grunt-contrib-cssmin');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-watch');
