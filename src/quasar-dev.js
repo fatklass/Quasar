@@ -4,7 +4,7 @@
  */
 Quasar = {
 	config : {
-		version : "2.1.2937",
+		version : "2.2.170",
 		name : "Quasar",
 		author : "Wesley Nascimento",
 		contributors : [],
