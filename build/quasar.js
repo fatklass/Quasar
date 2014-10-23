@@ -1,4 +1,3 @@
-'use strict';
 // Source: lib/QJSON.class.js
 /*
 	Simple JSON Controller for Quasar
@@ -2454,11 +2453,9 @@ String.prototype.contains = function (a) {
  */
 Quasar = {
 	config : {
-		version : "2.2.170",
+		version : "2.2.2690",
 		name : "Quasar",
 		author : "Wesley Nascimento",
-		contributors : [],
-
 		/* Metodos de armazenamento */
 		get : function (chave, def) {
 			var data = new QJSON(game_data.player.name);
@@ -2503,21 +2500,23 @@ Quasar = {
 				this.$countDown = $("#countDown");
 
 				//Adiciona os botoes ao menu
-				this.addButton(Quasar.lang.get("auto_farm"), "auto_farm", Quasar.farm.getStatus, Quasar.farm.setStatus);
-				this.addButton(Quasar.lang.get("auto_farm_post"), "auto_farm_post", Quasar.farm_post.getStatus, Quasar.farm_post.setStatus);
-				this.addButton(Quasar.lang.get("wall_drop"), "wall_drop", Quasar.wall.getStatus, Quasar.wall.setStatus);
-				this.addButton(Quasar.lang.get("auto_recruit"), "auto_recuit", Quasar.train.getStatus, Quasar.train.setStatus);
-				this.addButton(Quasar.lang.get("auto_build"), "auto_build", Quasar.main.getStatus, Quasar.main.setStatus);
-				this.addButton(Quasar.lang.get("am_farm"), "am_farm", Quasar.am_farm.getStatus, Quasar.am_farm.setStatus);
-				this.addButton(Quasar.lang.get("dodge"), "dodge", Quasar.dodge.getStatus, Quasar.dodge.setStatus);
-				this.addButton(Quasar.lang.get("coordinator"), "coordinator", Quasar.coordinator.getStatus, Quasar.coordinator.setStatus);
-				this.addButton(Quasar.lang.get("anti_afk"), "anti_afk", Quasar.nucleo.getAFK, null);
+				this.addButton(Quasar.lang.get("auto_farm"), Quasar.farm);
+				//this.addButton(Quasar.lang.get("auto_farm_post"), "auto_farm_post", Quasar.farm_post.getStatus, Quasar.farm_post.setStatus);
+				this.addButton(Quasar.lang.get("wall_drop"), Quasar.wall);
+				this.addButton(Quasar.lang.get("auto_recruit"), Quasar.train);
+				this.addButton(Quasar.lang.get("auto_build"), Quasar.main);
+				this.addButton(Quasar.lang.get("am_farm"), Quasar.am_farm);
+				this.addButton(Quasar.lang.get("dodge"), Quasar.dodge);
+				this.addButton(Quasar.lang.get("coordinator"), Quasar.coordinator);
+				this.addButton(Quasar.lang.get("anti_afk"), Quasar.nucleo);
 
-				this.addActionButton(Quasar.lang.get("import_export"), "import", function () {
+				this.addActionButton(Quasar.lang.get("import_export"), function () {
 					var html = "";
-					html += "Used to export and import your Data Storage.";
-					html += '<input type="text" value="" id="import_val" placeholder="Paste your game data here" size="20"><input type="button" value="Import" id="btn_import">';
-					html += '<input type="text" value="" id="export_val" placeholder="Click on export button" size="20"><input type="button" value="Export" id="btn_export">';
+					html += "Importe e exporte os dados do seu Quasar e configurações.";
+					html += '<table><tr>';
+					html += '<td><input type="text" value="" id="import_val" placeholder="Importar codigo de configurações" size="20"><input type="button" value="Importar" id="btn_import"></td>';
+					html += '<td><input type="text" value="" id="export_val" placeholder="Exportar configurações" size="20"><input type="button" value="Exportar" id="btn_export"></td>';
+					html += '</tr></table>';
 					var onDraw = function () {
 						$("#btn_import").on("click", function () {
 							var data = $("#import_val").val();
@@ -2535,11 +2534,13 @@ Quasar = {
 					Quasar.interface.menu.popupBox(Quasar.lang.get("import_export"), html, 400, null, onDraw);
 				});
 
-				this.addActionButton(Quasar.lang.get("configuration"), "config", function () {
+				this.addActionButton(Quasar.lang.get("configuration"), function () {
 					var onDraw = Quasar.interface.menu.configDraw;
 					var html = Quasar.interface.menu.configHtml();
 					Quasar.interface.menu.popupBox(Quasar.lang.get("configuration"), html, 400, null, onDraw);
 				});
+				
+				this.addActionButton(Quasar.lang.get("welcome_window"), Quasar.interface.menu.showWelcome);
 
 				this.addInformation("Ping", "ping", function () {
 					$("#ping").text(Number(Loader.timeEnd - Loader.timeStart) + "ms");
@@ -2587,28 +2588,31 @@ Quasar = {
 				this.$menu.append(html);
 			},
 			//Adiciona um Botão ao menu
-			addButton : function (text, id, getStatus, setStatus) {
-				this.$buttons.append('<div id="' + id + '" class="button">' + text + '</div>');
-				var element = $("#" + id);
+			addButton : function (text, menuObject) {
+				menuObject.$element = $('<div class="button">' + text + '</div>');				
+				
+				this.$buttons.append( menuObject.$element );
+				
 				var change = function () {
-					if (getStatus()) {
-						element.addClass("active");
+					if ( menuObject.getStatus()) {
+						menuObject.$element.addClass("active");
 					} else {
-						element.removeClass("active");
+						menuObject.$element.removeClass("active");
 					}
 				};
-				element.on('click', function () {
-					var status = getStatus();
-					setStatus(!status);
+				
+				menuObject.$element.on('click', function () {
+					var status = menuObject.getStatus();
+					menuObject.setStatus(!status);
 					change();
 				});
 				change();
 			},
 			//Adiciona um botão de ação ao menu
-			addActionButton : function (text, id, action) {
-				this.$buttons.append('<div id="' + id + '" class="button action">' + text + '</div>');
-				var element = $("#" + id);
-				element.on('click', action);
+			addActionButton : function (text, action) {				
+				var $element = $('<div class="button action">' + text + '</div>');
+				$element.on('click', action);
+				this.$buttons.append( $element );
 			},
 			//Adiciona um texto de informação ao menu
 			//As informaçoes podem ser tickaveis, ou seja, se atualizam
@@ -2779,7 +2783,7 @@ Quasar = {
 				html += '<tr><td><span title="Limita a distancia maxima a enviar um ataque.">Distancia de ataques maxima:</span></td><td><input type="text" id="max_am_dis" size="2" value="' + Quasar.config.get("max_am_dis", 20) + '"/>campos</td></tr>';
 				html += '<tr><td><span title="Limita a quantidade de ataques que podem ser enviados a uma aldeia baseando-se na distancia.">Usar sistema de razão?</span></td><td><input type="checkbox" id="am_is_by_ratio" ' + (Quasar.config.get("am_is_by_ratio", false) ? "checked" : "") + '/></td></tr>';
 				html += '<tr><td><span title="Quantidade de ataque para cada campo de distancia. Se configurado como 1, vai enviar 1 ataque para cada campo entre o alvo e a aldeia atual. (precisa que \"Usar sistema de razão\" esteja ativo)">Ataque por campo: </span></td><td><input type="text" id="am_dis_ratio" size="2" value="' + Quasar.config.get("am_dis_ratio", 1) + '"/>(Ex: 0.2)</td></tr>';
-				html += '<tr><td><span title="O controlador de ataques prioriza atacar aldeias que tenham menos ataques a caminho, isso previne que as primeiras aldeias da pagina tenham muitos ataques enquanto outras da mesma pagina não tenhão nenhum.">Usar controlador de ataques? </span></td><td><input type="checkbox" id="attack_control" ' + (Quasar.config.get("attack_control", true) ? "checked" : "") + '/></td></tr>';
+				html += '<tr><td><span title="O controlador de ataques prioriza atacar aldeias que tenham menos ataques a caminho, isso previne que as primeiras aldeias da pagina tenham muitos ataques enquanto outras da mesma pagina não tenhão nenhum.">Usar controlador de ataques? </span></td><td><input type="checkbox" id="attack_control" ' + (Quasar.config.get("attack_control", false) ? "checked" : "") + '/></td></tr>';
 				html += '<tr><td><span title="Configura uma quantidade maxima de ataques a uma aldeia. (Funciona somente se \"Usar sistema de razão\" estiver desabilitado.)">Quantidade maxima de ataques: </span></td><td><input type="text" id="max_am_attacks" size="2" value="' + Quasar.config.get("max_am_attacks", 2) + '"/></td></tr>';
 				html += '<tr><td><span title="Configura o nivel maximo de muralha permitido para um ataque.">Nivel maximo de muralha:</span></td><td><input type="text" id="max_am_wall" size="2" value="' + Quasar.config.get("max_am_wall", 3) + '"/></td></tr>';
 				html += '<tr><td><span title="Permite atacar aldeias cujo o ultimo relatorio foi azuis.">Atacar relatorios azuis?: </span></td><td><input type="checkbox" id="blue_reports" ' + (Quasar.config.get("blue_reports", false) ? "checked" : "") + '/></td></tr>';
@@ -2797,16 +2801,61 @@ Quasar = {
 
 				html += '</tbody></table>';
 				html += '<div>';
-				html += '<input type="button" id="save" value="Salvar"/>';
+				html += '<input  class="btn" type="button" id="save" value="Salvar"/>';
 				html += '</div>';
 				return html;
+			},
+			showWelcome : function(){
+				var html = "";
+				html += "<span style='size: 16px; font-weight: bold'>Sobre o Quasar.</span></br>";
+				html += "Quasar é formado por um conjunto de ferramentas, cujo o intuito é fazer com que seja mais pratico jogar TribalWars.</br>";
+				html += "Algumas dessas ferramentas são ilegais segundo as regras do jogo, esteja ciente que o mal uso ou uso excessivo pode causar o banimento de sua conta.</br>";
+				html += "Quasar tem sido desenvolvido por <strong>Wesley Nascimento</strong> desde Novembro de 2013. E vem sido distribuido dentro da licensa Creative Commons.</br>";
+
+				html += "<br><strong style='size: 16px; font-weight: bold'>Termos de uso e Politica de privacidade</strong></br>";
+				html += "<ul>";
+				html += "<li>O author não se resposabiliza por punições ou banimentos.</li>";
+				html += "<li>Quasar envia informaçoes anonimas sobre seu uso para um servidor externo.</li>";
+				html += "<li>O author não garante suporte ao projeto a longo prazo.</li>";
+				html += "<li>O author se reserva ao direito de mudar esses termos a qualquer momento sem aviso previo ou posterior.</li>";
+				html += "<li>Quasar armazena informações e configurações em seu navegador.</li>";
+				html += "</ul>";
+				html += "<span style='color:#c00; font-weight: bold'>Ao usar o Quasar você automaticamente está ciente e concorda com todos os termos listados acima.</span></br>";
+
+				html += "<br><span style='size: 16px; font-weight: bold'>Terminando a instalação</span></br>";
+				html += "Para que você possa executar o Quasar sem problemas ou conflitos é preciso que ele obtenha algumas informações da sua conta.</br>";
+				html += "<ul>";
+				html += "<li>Quantidade de aldeias.</li>";
+				html += "<li>Identificação das aldeias.</li>";
+				html += "<li>Se possui conta premium.</li>";
+				html += "<li>Se possui assistente de saques.</li>";
+				html += "<li>Quantidade de ataques chegando.</li>";
+				html += "<li>Se está em modo de ferias.</li>";
+				html += "<li>Se está como sitter.</li>";
+				html += "</ul>";
+				html += "<br>Essas informações serão obtidas automaticamente ao clicar no botão abaixo. Atenção você será redirecionado para outra pagina.</br>";
+				html += "<center><a href='#' id='btn_first_use' class='evt-confirm btn'>Configurar</a></center></br>";
+
+				html += '<center><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Licença Creative Commons" style="border-width:0" src="https://i.creativecommons.org/l/by-nc/4.0/88x31.png" /></a><br /><span xmlns:dct="http://purl.org/dc/terms/" property="dct:title">Quasar</span> de <a xmlns:cc="http://creativecommons.org/ns#" href="wesleynascimento.com/quasar" property="cc:attributionName" rel="cc:attributionURL">wesleynascimento.com/quasar</a> está licenciado com uma Licença <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons - Atribuição-NãoComercial 4.0 Internacional</a>.</center>';
+
+				var callback = function () {
+					$("#btn_first_use").on("click", function () {
+						if (game_data.player.sitter === 0) {
+							location.href = "?village=" + game_data.village.id + "&screen=overview_villages";
+						} else {
+							var sitter = location.href.match(/t=\d+/i);
+							location.href = "?village=" + game_data.village.id + "&screen=overview_villages&" + sitter;
+						}						
+					});
+				};
+				Quasar.interface.menu.popupBox("Bem vindo ao Quasar!", html, 600, null, callback);
 			}
 		},
 		/*
 		 * Cria a interface interna da Praça de Reunioes
 		 */
 		praca : function () {
-			var $main_table = $('<table class="content-border vis nowrap tall" width="100%" id="build_script" style="opacity:0">' + '<tr><th style="width: 66%">' + Quasar.lang.get("villages") + ' [ <a id="ordenar">' + Quasar.lang.get("order") + '</a> | <a id="limpar">' + Quasar.lang.get("clean") + '</a> ]</th></tr>' + '<tr><td><input type="text" id="coords" name="name" value="" style="width: 90%;" placeholder="Paste your farm coords here (e.g. 666|666 666|666)">(<span id="current">0</span>/<span id="number">0</span>)</td></tr>' + '<tr><td><input type="text" id="wall_coords" name="name" value="" style="width: 90%;" placeholder="Paste wall-drop coords here (e.g. 666|666 666|666)">(<span id="wall_number">0</span>)</td></tr>' + '</table></br>');
+			var $main_table = $('<table class="content-border vis nowrap tall" width="100%" id="build_script" style="opacity:0">' + '<tr><th style="width: 66%">' + Quasar.lang.get("villages") + ' [ <a id="ordenar">' + Quasar.lang.get("order") + '</a> | <a id="limpar">' + Quasar.lang.get("clean") + '</a> ]</th></tr>' + '<tr><td><input type="text" id="coords" name="name" value="" style="width: 90%;" placeholder="Cole coordenadas para darmar aqui (ex: 666|666 666|666)">(<span id="current">0</span>/<span id="number">0</span>)</td></tr>' + '<tr><td><input type="text" id="wall_coords" name="name" value="" style="width: 90%;" placeholder="Cole coordenadas para o derrubador de muralha (ex: 666|666 666|666)">(<span id="wall_number">0</span>)</td></tr>' + '</table></br>');
 			$("#contentContainer").before($main_table);
 
 			var $coords = $("#coords");
@@ -2872,58 +2921,29 @@ Quasar = {
 		init : function () {
 			console.log("Started");
 
+			//Se estiver com o CAPTCHA do jogo na tela, nao faz nada, just cry :(
+			if ($("#bot_check_image").length > 0) {
+				$("body").append('<object height="50" width="100" data="'+ Loader.host +'/alarm.mp3"></object>');
+				$(document).prop('title', 'ALERTA CAPTCHA');
+				return;
+			}
+			
 			//Inicia a linguagem
 			Quasar.lang.init();
 
 			//Se for o primeiro uso
 			if (Quasar.config.get("last_version_used", null) === null) {
-				var html = "";
-				html += "<span style='size: 16px; font-weight: bold'>Sobre o Quasar.</span></br>";
-				html += "Quasar é formado por um conjunto de ferramentas, cujo o intuito é fazer com que seja mais pratico jogar TribalWars.</br>";
-				html += "Algumas dessas ferramentas são ilegais segundo as regras do jogo, esteja ciente que o mal uso ou uso excessivo pode causar o banimento de sua conta.</br>";
-				html += "Quasar tem sido desenvolvido por <strong>Wesley Nascimento</strong> desde Novembro de 2013. E vem sido distribuido dentro da licensa Creative Commons.</br>";
-
-				html += "<br><strong style='size: 16px; font-weight: bold'>Termos de uso e Politica de privacidade</strong></br>";
-				html += "<ul>";
-				html += "<li>O author não se resposabiliza por punições ou banimentos.</li>";
-				html += "<li>Quasar envia informaçoes anonimas sobre seu uso para um servidor externo.</li>";
-				html += "<li>O author não garante suporte ao projeto a longo prazo.</li>";
-				html += "<li>O author se reserva ao direito de mudar esses termos a qualquer momento sem aviso previo ou posterior.</li>";
-				html += "<li>Quasar armazena informações e configurações em seu navegador.</li>";
-				html += "</ul>";
-				html += "<span style='color:#c00; font-weight: bold'>Ao usar o Quasar você automaticamente está ciente e concorda com todos os termos listados acima.</span></br>";
-
-				html += "<br><span style='size: 16px; font-weight: bold'>Terminando a instalação</span></br>";
-				html += "Para que você possa executar o Quasar sem problemas ou conflitos é preciso que ele obtenha algumas informações da sua conta.</br>";
-				html += "<ul>";
-				html += "<li>Quantidade de aldeias.</li>";
-				html += "<li>Identificação das aldeias.</li>";
-				html += "<li>Se possui conta premium.</li>";
-				html += "<li>Se possui assistente de saques.</li>";
-				html += "<li>Quantidade de ataques chegando.</li>";
-				html += "<li>Se está em modo de ferias.</li>";
-				html += "<li>Se está como sitter.</li>";
-				html += "</ul>";
-				html += "<br>Essas informações serão obtidas automaticamente ao clicar no botão abaixo. Atenção você será redirecionado para outra pagina.</br>";
-				html += "<center><a href='#' id='btn_first_use' class='evt-confirm btn'>Configurar</a></center></br>";
-
-				html += '<center><a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/"><img alt="Licença Creative Commons" style="border-width:0" src="https://i.creativecommons.org/l/by-nc/4.0/88x31.png" /></a><br /><span xmlns:dct="http://purl.org/dc/terms/" property="dct:title">Quasar</span> de <a xmlns:cc="http://creativecommons.org/ns#" href="wesleynascimento.com/quasar" property="cc:attributionName" rel="cc:attributionURL">wesleynascimento.com/quasar</a> está licenciado com uma Licença <a rel="license" href="http://creativecommons.org/licenses/by-nc/4.0/">Creative Commons - Atribuição-NãoComercial 4.0 Internacional</a>.</center>';
-
-				var callback = function () {
-					$("#btn_first_use").on("click", function () {
-						if (game_data.player.sitter === 0) {
-							location.href = "?village=" + game_data.village.id + "&screen=overview_villages";
-						} else {
-							var sitter = location.href.match(/t=\d+/i);
-							location.href = "?village=" + game_data.village.id + "&screen=overview_villages&" + sitter;
-						}
-						Quasar.config.set("last_version_used", Quasar.config.version);
-					});
-				};
-				Quasar.interface.menu.popupBox("Bem vindo ao Quasar!", html, 600, null, callback);
+				if( game_data.screen == 'overview_villages' ){
+					Quasar.overview_villages.saveVillages();
+					UI.SuccessMessage("Quasar obteve informações obre sua conta e está pronto para uso!");
+					Quasar.config.set("last_version_used", Quasar.config.version);
+					return;
+				}				
+				Quasar.interface.menu.showWelcome();
 			}
 			//Se não for o primeiro uso, mas se for uma versão mais recente
 			else if (Quasar.config.get("last_version_used", "") !== Quasar.config.version) {
+				UI.SuccessMessage("Detectado que uma nova versão do Quasar foi instalado!");
 				Quasar.config.set("last_version_used", Quasar.config.version);
 			}
 			//Atualiza esta aldeia a lista de aldeias
@@ -2939,13 +2959,7 @@ Quasar = {
 			var url = location.href; //URL atual
 
 			//Incrementa a contagem de execuçoes
-			Quasar.config.set('total_execucoes', Quasar.config.get('total_execucoes', 0) + 1);
-
-			//Se estiver com o CAPTCHA do jogo na tela, nao faz nada.
-			if ($("#bot_check_image").length > 0) {
-				$("body").append('<object height="50" width="100" data="'+ Loader.host +'/alarm.mp3"></object>');
-				return;
-			}
+			Quasar.config.set('total_execucoes', Quasar.config.get('total_execucoes', 0) + 1);			
 
 			//Pega um numero aleatorio, e se for igual a 10 abre uma pagina aleatoria
 			if (Quasar.utils.random(0, 10) == 10) {
@@ -3026,14 +3040,16 @@ Quasar = {
 			//Inicia a interface ao final para prover um melhor desempenho
 			Quasar.interface.menu.init();
 		},
-		getAFK : function () {
+		getStatus : function () {
 			return Quasar.config.get('anti_afk', true);
 		},
-		setAFK : function (status) {
+		setStatus : function (status) {
+			return;
+			//Can't disable anti-captcha
 			Quasar.config.set('anti_afk', status);
 		},
 		abrirPaginaAleatoria : function () {
-			var status = this.getAFK();
+			var status = this.getStatus();
 			Quasar.config.set('count', 0);
 			if (!status)
 				return;
@@ -3789,122 +3805,6 @@ Quasar = {
 			}
 		}
 	},
-	planner : {
-		init : function () {
-			var plan = Quasar.config.get("plan", []);
-			var row,
-			now,
-			want,
-			hour,
-			day,
-			timeToExec;
-
-			var attack_function = function () {
-				Quasar.planner.attack(i);
-			};
-
-			for (var i = 0; i < plan.length; i++) {
-				row = new QJSON(plan[i]);
-				day = row.get("day");
-				hour = row.get("hour");
-				now = new Date();
-				want = new Date(day.split("/")[2], day.split("/")[1], day.split("/")[0], hour.split(":")[0], hour.split(":")[1], hour.split(":")[2], hour.split(":")[3]);
-				timeToExec = now - want;
-				if (timeToExec > 0) {
-					setTimout(attack_function, time);
-				}
-			}
-		},
-		attack : function (id) {},
-		showPOP : function () {
-			var head = '<h3>NOT WORKING YET</h3>';
-			var add = '<table class="vis" width="100%"><tbody><tr>';
-			add += '<td><table class="vis" width="100%"><tbody>';
-			add += '<tr><td class="nowrap"><img src="/graphic/unit/unit_spear.png" alt="" class=""> <input id="plan_input_spear" name="spear" type="text" style="width: 40px" tabindex="1" value="" class="unitsInput"></td></tr>';
-			add += '<tr><td class="nowrap"><img src="/graphic/unit/unit_sword.png" alt="" class=""> <input id="plan_input_sword" name="sword" type="text" style="width: 40px" tabindex="2" value="" class="unitsInput"></td></tr>';
-			add += '<tr><td class="nowrap"><img src="/graphic/unit/unit_axe.png" alt="" class=""> <input id="plan_input_axe" name="axe" type="text" style="width: 40px" tabindex="3" value="" class="unitsInput"></td></tr>';
-			add += '<tr><td class="nowrap"><img src="/graphic/unit/unit_archer.png" alt="" class=""> <input id="plan_input_archer" name="archer" type="text" style="width: 40px" tabindex="4" value="" class="unitsInput"></td></tr>';
-			add += '</tbody></table></td>';
-			add += '<td><table class="vis" width="100%"><tbody>';
-			add += '<tr><td class="nowrap"><img src="/graphic/unit/unit_spy.png" alt="" class=""> <input id="plan_input_spy" name="spy" type="text" style="width: 40px" tabindex="5" value="" class="unitsInput"></td></tr>';
-			add += '<tr><td class="nowrap"><img src="/graphic/unit/unit_light.png" alt="" class=""> <input id="plan_input_light" name="light" type="text" style="width: 40px" tabindex="6" value="" class="unitsInput"></td></tr>';
-			add += '<tr><td class="nowrap"><img src="/graphic/unit/unit_marcher.png" alt="" class=""> <input id="plan_input_marcher" name="marcher" type="text" style="width: 40px" tabindex="7" value="" class="unitsInput"></td></tr>';
-			add += '<tr><td class="nowrap"><img src="/graphic/unit/unit_heavy.png" alt="" class=""> <input id="plan_input_heavy" name="heavy" type="text" style="width: 40px" tabindex="8" value="" class="unitsInput"></td></tr>';
-			add += '</tbody></table></td>';
-			add += '<td><table class="vis" width="100%"><tbody>';
-			add += '<tr><td class="nowrap"><img src="/graphic/unit/unit_ram.png" alt="" class=""> <input id="plan_input_ram" name="ram" type="text" style="width: 40px" tabindex="9" value="" class="unitsInput"></td></tr>';
-			add += '<tr><td class="nowrap"><img src="/graphic/unit/unit_catapult.png" alt="" class=""> <input id="plan_input_catapult" name="catapult" type="text" style="width: 40px" tabindex="10" value="" class="unitsInput"></td></tr>';
-			add += '<tr><td class="nowrap"><img src="/graphic/unit/unit_knight.png" alt="" class=""> <input id="plan_input_knight" name="knight" type="text" style="width: 40px" tabindex="11" value="" class="unitsInput"></td></tr>';
-			add += '<tr><td class="nowrap"><img src="/graphic/unit/unit_snob.png" alt="" class=""> <input id="plan_input_snob" name="snob" type="text" style="width: 40px" tabindex="12" value="" class="unitsInput"></td></tr>';
-			add += '</tbody></table></td>';
-			add += '<td><table class="vis" width="100%"><tbody>';
-			add += '<tr><td class="nowrap">Day: <input id="input_day" type="text" style="width: 80px; float: right" tabindex="13" value="" class="unitsInput" size="10" placeholder="day/month/year"></td></tr>';
-			add += '<tr><td class="nowrap">Hour: <input id="input_hour" type="text" style="width: 80px; float: right" tabindex="14" value="" class="unitsInput" size="12" placeholder="00:00:00:000"></td></tr>';
-			add += '<tr><td class="nowrap">Coord: <input id="input_coord" type="text" style="width: 80px; float: right" tabindex="15" value="" class="unitsInput" placeholder="xxx|yyy"></td></tr>';
-			add += '<tr><td class="nowrap">From: ' + game_data.village.coord + '<input id="button_save" type="button" tabindex="16" value="' + Quasar.lang.get("save") + '" style="float: right" class="unitsInput"></td></tr>';
-			add += '</tbody></table></td>';
-			add += '</tr></tbody></table>';
-			var list = "";
-			var plan = Quasar.config.get("plan", []);
-			list += '<table class="vis" width="100%"><tbody>';
-			for (var i = 0; i < plan.length; i++) {
-				var row = new QJSON(plan[i]);
-				list += '<tr>';
-				for (var chave in row.cache) {
-					if (chave !== "day" && chave !== "hour" && chave !== "coord" && row.get(chave) !== 0) {
-						list += '<td><img src="/graphic/unit/unit_' + chave + '.png">' + row.get(chave) + '</td>';
-					}
-				}
-				list += '<td>' + row.get("coord") + '</td>';
-				list += '<td>' + row.get("day") + '</td>';
-				list += '<td>' + row.get("hour") + '</td>';
-				list += '<td><img class="tool_icon icon header" id="button_remove" data-ed="' + i + '" title="remove" src="/graphic/forum/thread_delete.png"></td>';
-				list += '</tr>';
-			}
-			list += '</tbody></table>';
-			var onDraw = function () {
-				$("#button_save").on('click', function () {
-					var allBlank = true;
-					var value;
-					var plan = Quasar.config.get("plan", []);
-					var row = new QJSON("lastAttack");
-					for (var unit in Quasar.game.units) {
-						value = Number($("#plan_input_" + unit).val());
-						row.set(unit, value);
-						if (value !== 0) {
-							allBlank = false;
-						}
-					}
-					var day = $("#input_day").val();
-					var hour = $("#input_hour").val();
-					var coord = $("#input_coord").val();
-					row.set("day", day);
-					row.set("hour", hour);
-					row.set("coord", coord);
-					if (!allBlank && hour !== null && hour !== "" && day !== null && day !== "" && coord !== null && coord !== "") {
-						if (hour.split(":").length == 4 && day.split("/").length == 3 && coord.split("|").length == 2) {
-							plan.push(row.toJSON());
-							Quasar.config.set("plan", plan);
-							Quasar.interface.menu.closePop();
-						} else {
-							alert("Erro no formato de hora, data ou coord.");
-						}
-					} else {
-						alert("Error algum campo necessario esta em branco.");
-					}
-				});
-				$("#button_remove").on('click', function () {
-					var id = $(this).attr("data-ed");
-					var plan = Quasar.config.get("plan", []);
-					plan.splice(id, 1);
-					Quasar.config.set("plan", plan);
-					$(this).parent().parent().remove();
-				});
-			};
-			var html = head + add + list;
-			Quasar.interface.menu.popupBox(Quasar.lang.get("planner"), html, 450, null, onDraw);
-		},
-	},
 	report : {
 		init : function () {
 			Quasar.report.UI.init();
@@ -4054,13 +3954,18 @@ Quasar = {
 			return Quasar.config.get("break_wall");
 		},
 		setStatus : function (status) {
+			if( Quasar.coordinator.getStatus() ){
+				Quasar.coordinator.setStatus( false );
+				UI.InfoMessage("O coordenador foi desativado para não gerar conflito com o derrubador de muralhas.");
+				$("#coordinator").removeClass("active");
+			}
 			Quasar.config.set("break_wall", status);
 		}
 	},
 	am_farm : {
 		jump : false,
 		cicle : 0,
-		rows : 0,
+		rows : 0,		
 		init : function () {
 			Quasar.am_farm.UI.init();
 			if (!Quasar.am_farm.getStatus())
@@ -4073,7 +3978,7 @@ Quasar = {
 			var IS_BY_RATIO = Quasar.config.get("am_is_by_ratio", false);
 			var MAXATTACK = Number(Quasar.config.get("max_am_attacks", 2));
 			var RATIO = Number(Quasar.config.get("am_dis_ratio", 1));
-			var ATTACK_CONTROL = Quasar.config.get("attack_control", true);
+			var ATTACK_CONTROL = Quasar.config.get("attack_control", false);
 			var MAXDIS = Number(Quasar.config.get("max_am_dis", 20));
 			var BLUE_SET = Quasar.config.get("blue_reports", false);
 			var YELLOW_SET = Quasar.config.get("yellow_reports", true);
@@ -4405,7 +4310,17 @@ Quasar = {
 		},
 		cache : "br",
 		get : function (string) {
-			return Quasar.lang[this.cache][string];
+			var lang = Quasar.lang[ this.cache ];
+			if( typeof lang == "undefined" || lang == null ){
+				return string;
+			}
+		
+			var result = lang[string];
+			
+			if( typeof result == "undefined" ){
+				return string;
+			}
+			return result;
 		},
 		br : {
 			save : "Salvar",
@@ -4446,6 +4361,7 @@ Quasar = {
 			show_coords : "Mostrar coordenadas",
 			map_size : "Tamanho do mapa",
 			configuration : "Configuracoes",
+			welcome_window : "Boas vindas",
 			import_export : "Importar/Exportar"
 		}
 	},
