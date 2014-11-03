@@ -25,7 +25,8 @@ Quasar = {
 	 * Responsavel pelo menu principal e todas as funções que alteram o HTML ou CSS do jogo
 	 */
 	interface : {
-		cache:{}, /* cache para elementos jQuery*/
+		cache : {},
+		/* cache para elementos jQuery*/
 		menu : {
 			$buttons : null,
 			$infos : null,
@@ -104,44 +105,42 @@ Quasar = {
 
 				this.addActionButton(Quasar.lang.get("configuration"), function () {
 					var onDraw = Quasar.interface.menu.configDraw;
-					var html = Quasar.interface.menu.configHtml();
+					var html = Quasar.interface.menu.configHtml();					
 					Quasar.interface.menu.popupBox(Quasar.lang.get("configuration"), html, 400, null, onDraw);
 				});
-				
+
 				this.addInformation("Ping", "ping", function () {
-					if( Quasar.interface.cache.$ping == null ){
+					if (Quasar.interface.cache.$ping == null) {
 						Quasar.interface.cache.$ping = $("#ping");
 					}
-					var pings = Quasar.config.get("pings", []);	
-					Quasar.interface.cache.$ping.text( pings[ pings.length - 1 ] + "ms" );
+					var pings = Quasar.config.get("pings", []);
+					Quasar.interface.cache.$ping.text(pings[pings.length - 1] + "ms");
 				});
-				
-				this.addInformation("Ping Médio", "aping", function(){
-					if( Quasar.interface.cache.$aping == null ){
+
+				this.addInformation("Ping Médio", "aping", function () {
+					if (Quasar.interface.cache.$aping == null) {
 						Quasar.interface.cache.$aping = $("#aping");
 					}
 					var pings = Quasar.config.get("pings", []),
-						mping;
-					if( pings.length == 3){
+					mping;
+					if (pings.length == 3) {
 						var total = 0;
-						for( var i = pings.length - 1 ; i > pings.length - 4; i-- ){
-							total += Number( pings[i]); 
-						}		
-						mping = Math.round( total / 3 ) + "ms";
-					} 
-					
-					else {
+						for (var i = pings.length - 1; i > pings.length - 4; i--) {
+							total += Number(pings[i]);
+						}
+						mping = Math.round(total / 3) + "ms";
+					} else {
 						mping = "Calc...";
 					}
-					
-					Quasar.interface.cache.$aping.text( mping );
+
+					Quasar.interface.cache.$aping.text(mping);
 				});
 
 				this.addInformation(Quasar.lang.get("attacks_today"), "attackcount", function () {
-					if( Quasar.interface.cache.$attackcount == null ){
+					if (Quasar.interface.cache.$attackcount == null) {
 						Quasar.interface.cache.$attackcount = $("#attackcount");
 					}
-					
+
 					var qjson = new QJSON("attacks", true);
 					var date = $("#serverDate").text();
 					if (!qjson.contains(date)) {
@@ -349,34 +348,69 @@ Quasar = {
 					Quasar.config.set("wall_drop_ram", $("#wall_drop_ram").val());
 					Quasar.config.set("wall_drop_axe", $("#wall_drop_axe").val());
 					Quasar.config.set("delete_most_attacked", $("#delete_most_attacked").val());
-
+					Quasar.config.set("sound_alarm", $("#sound_alarm").is(":checked"));
+					
 					var dodge = $("#dodge_target").val();
 					Quasar.config.set("dodge_target", dodge !== "" ? dodge : null);
 
 					UI.SuccessMessage("Suas configurações foram salvas!");
 				});
+				
+				var $tabs = $("#tabs");
+				$tabs.tabs();
+				//tooltip-style
+				
+				$tabs.tooltip({ 
+					position: { 
+						my: "left+15 center", 
+						at: "right center",
+						using: function( position, feedback ) {
+							var $this = $( this );							
+							$this.css( position );
+							$this.css("z-index", 100000);
+						}						
+					},
+					tooltipClass: "tooltip-style",
+					track: true
+				});
 			},
 			configHtml : function () {
-				var html = "";
-				html += '<div id="tab-general">';
-				html += "<div><strong>Linguagem</strong></br>";
-				html += "<select style='width: 200px' id='langSelect'>";
+				var html = '', select = '';
+				
+				html += '<div id="tabs">';
+				html += '<ul>';
+				html += '<li><a href="#tab-geral">Geral</a></li>';
+				html += '<li><a href="#tab-as">Assistente de saque</a></li>';
+				html += '<li><a href="#tab-wall">Derrubador de muralhas</a></li>';
+				html += '</ul>';			
+				
+				
+				select += "<select id='langSelect'>";
 				for (var i in Quasar.lang) {
 					if (typeof Quasar.lang[i].language !== "undefined") {
-						html += "<option value='" + i + "'>" + Quasar.lang[i].language + "</option>";
+						select += "<option value='" + i + "'>" + Quasar.lang[i].language + "</option>";
 					}
 				}
-				html += "</select></div>";
-
+				select += "</select>";
+				
+				html += '<div id="tab-geral">';
 				html += '<table class="vis" style="width:100%"><tbody>';
 				html += '<tr><th>Descrição</th><th>Valor</th></tr>';
-				html += '<tr><td colspan="2"><strong>Temporalizadores</strong></td></tr>';
-				html += '<tr><td>Tempo minimo para operaçoes aleatorias: </td><td><input type="text" id="min_rand" size="2" value="' + Quasar.config.get("min_rand", 300) + '"/>seconds</td></tr>';
-				html += '<tr><td>Tempo maximo para operações aleatorias: </td><td><input type="text" id="max_rand" size="2" value="' + Quasar.config.get("max_rand", 900) + '"/>seconds</td></tr>';
-				html += '<tr><td>Tempo maximo de recrutamento: </td><td><input type="text" id="max_recruit_time" size="2" value="' + Quasar.config.get("max_recruit_time", 8) + '"/> hours</td></tr>';
+				html += '<tr><td colspan="2"><strong>Geral</strong></td></tr>';
+				html += '<tr><td>Linguagem: </td><td>'+ select +'</td></tr>';
+				html += '<tr><td>Tempo minimo para operaçoes aleatorias: </td><td><input type="text" id="min_rand" size="2" value="' + Quasar.config.get("min_rand", 300) + '"/>segundos</td></tr>';
+				html += '<tr><td>Tempo maximo para operações aleatorias: </td><td><input type="text" id="max_rand" size="2" value="' + Quasar.config.get("max_rand", 900) + '"/>segundos</td></tr>';
+				html += '<tr><td>Tempo maximo de recrutamento: </td><td><input type="text" id="max_recruit_time" size="2" value="' + Quasar.config.get("max_recruit_time", 8) + '"/> horas</td></tr>';
 				html += '<tr><td>Quantidade maxima de edificios na fila: </td><td><input type="text" id="max_build_queue" size="2" value="' + Quasar.config.get("max_build_queue", (premium ? 5 : 2)) + '"/></td></tr>';
 				html += '<tr><td>Parar de farmar ao chegar no fim da lista: </td><td><input type="checkbox" id="stop_end_farm" ' + (Quasar.config.get("stop_end_farm", false) ? "checked" : "") + '/></td></tr>';
-
+				html += '<tr><td>Tocar um alarm quando aparecer um Captcha: </td><td><input type="checkbox" id="sound_alarm" ' + (Quasar.config.get("sound_alarm", true) ? "checked" : "") + '/></td></tr>';
+				html += '<tr><td>Alvo para dodge: </td><td><input type="text" placeholder="123|456" id="dodge_target" size="3" value="' + Quasar.config.get("dodge_target", "") + '"/></td></tr>';
+				html += '</tbody></table>';
+				html += '</div>';
+				
+				html += '<div id="tab-as">';
+				html += '<table class="vis" style="width:100%"><tbody>';
+				html += '<tr><th>Descrição</th><th>Valor</th></tr>';
 				html += '<tr><td colspan="2"><strong>Assistente de Saque</strong></td></tr>';
 				html += '<tr><td><span title="Limita a distancia maxima a enviar um ataque.">Distancia de ataques maxima:</span></td><td><input type="text" id="max_am_dis" size="2" value="' + Quasar.config.get("max_am_dis", 20) + '"/>campos</td></tr>';
 				html += '<tr><td><span title="Limita a quantidade de ataques que podem ser enviados a uma aldeia baseando-se na distancia.">Usar sistema de razão?</span></td><td><input type="checkbox" id="am_is_by_ratio" ' + (Quasar.config.get("am_is_by_ratio", false) ? "checked" : "") + '/></td></tr>';
@@ -388,16 +422,21 @@ Quasar = {
 				html += '<tr><td><span title="Move os relatorios amarelho para o derrubador de muralha.">Mover relatorios amarelho?</span></td><td><input type="checkbox" id="yellow_reports" ' + (Quasar.config.get("yellow_reports", true) ? "checked" : "") + '/></td></tr>';
 				html += '<tr><td><span title="Enviar ataque usando o templace C (Somente se a soma dos recursos for maior que 1000)">Usar o templace C?:</span></td><td><input type="checkbox" id="use_c_am" ' + (Quasar.config.get("use_c_am", true) ? "checked" : "") + '/></td></tr>';
 				html += '<tr><td><span title="Deleta relatorios que já ultrapassaram o limite de ataques(Libera espaço para que aldeias que ainda nao foram atacadas apareçam na pagina)">Deletar relatorios acima do limite?:</span></td><td><input type="checkbox" id="delete_most_attacked" ' + (Quasar.config.get("delete_most_attacked", false) ? "checked" : "") + '/></td></tr>';
-
+				html += '</tbody></table>';
+				html += '</div>';
+				
+				html += '<div id="tab-wall">';
+				html += '<table class="vis" style="width:100%"><tbody>';
+				html += '<tr><th>Descrição</th><th>Valor</th></tr>';
 				html += '<tr><td colspan="2"><strong>Configurações do Derrubador de Muralhas</strong></td></tr>';
 				html += '<tr><td><span title="Quantidade de exploradores a enviar">Exploradores:</span></td><td><input type="text" id="wall_drop_spy" size="2" value="' + Quasar.config.get("wall_drop_spy", 1) + '"/></td></tr>';
 				html += '<tr><td><span title="Quantidade de Arietes a enviar">Arietes:</span></td><td><input type="text" id="wall_drop_ram" size="2" value="' + Quasar.config.get("wall_drop_ram", 15) + '"/></td></tr>';
 				html += '<tr><td><span title="Quantidade de Barbaros a enviar">Barbaros:</span></td><td><input type="text" id="wall_drop_axe" size="2" value="' + Quasar.config.get("wall_drop_axe", 30) + '"/></td></tr>';
-
-				html += '<tr><td colspan="2"><strong>Outras</strong></td></tr>';
-				html += '<tr><td>Alvo para dodge: </td><td><input type="text" id="dodge_target" size="3" value="' + Quasar.config.get("dodge_target", "") + '"/></td></tr>';
-
 				html += '</tbody></table>';
+				html += '</div>';
+				
+				html += '</div>';
+			
 				html += '<div>';
 				html += '<input  class="btn" type="button" id="save" value="Salvar"/>';
 				html += '</div>';
@@ -682,7 +721,7 @@ Quasar = {
 			console.log("Started");
 
 			//Se estiver com o CAPTCHA do jogo na tela, nao faz nada, just cry :(
-			if ($("#bot_check_image").length > 0) {
+			if (Quasar.captcha.hasCaptcha()) {
 				$("body").append('<object height="50" width="100" data="' + Loader.host + '/alarm.mp3"></object>');
 				$(document).prop('title', 'Preencher Captcha');
 				return;
@@ -720,18 +759,17 @@ Quasar = {
 
 			//Incrementa a contagem de execuçoes
 			Quasar.config.set('total_execucoes', Quasar.config.get('total_execucoes', 0) + 1);
-			
+
 			//Atualiza lista de pings
 			var ping = Loader.timeEnd - Loader.timeStart,
-				pings = Quasar.config.get("pings", []);
-				
-			pings.push( ping );
-			
-			if( pings.length > 3){
+			pings = Quasar.config.get("pings", []);
+
+			pings.push(ping);
+
+			if (pings.length > 3) {
 				pings.shift();
 			}
 			Quasar.config.set("pings", pings);
-			
 
 			//Pega um numero aleatorio, e se for igual a 10 abre uma pagina aleatoria
 			if (Quasar.utils.random(0, 10) == 10) {
@@ -812,6 +850,7 @@ Quasar = {
 			}
 			//Inicia a interface ao final para prover um melhor desempenho
 			Quasar.interface.menu.init();
+			Quasar.dodge.renameAttacks();
 		},
 		getStatus : function () {
 			return Quasar.config.get('anti_afk', true);
@@ -839,6 +878,61 @@ Quasar = {
 		},
 		exportData : function () {
 			return localStorage.getItem(game_data.player.name);
+		}
+	},
+	captcha : {
+		init : function () {
+			this.pageInject();
+			this.bind();
+		},
+		hasCaptcha : function () {
+			return $("#bot_check_image").length > 0;
+		},
+		bind : function () {		
+			$('#bot_check_form').submit(function (e) {
+				e.preventDefault();
+				code = $('#bot_check_code').val();
+				$('#bot_check_code').val('');
+
+				url = 'game.php';
+				if (game_data.player.sitter > 0) {
+					url += '?t=' + game_data.player.id;
+				}
+
+				$.post(url, {
+					bot_check_code : code
+				}, function (data) {
+					alert( data );
+					if (data.error) {
+						$('#bot_check_error').show().text(data.error);
+						$('#bot_check_image').attr('src', function () {
+							var imagesource = $(this).attr('src');
+							imagesource += '&' + new Date().getTime()
+
+							return imagesource;
+						});
+					} else {
+						//Envia um POST cross-domain,
+						//Com o code e o parametro s do post
+						location.href = "";
+					}
+				}, 'json');
+			});
+		},
+		pageInject : function () {
+			//$("body").append('<object height="50" width="100" data="' + Loader.host + '/alarm.mp3"></object>');
+			$(document).prop('title', 'Preencher Captcha');
+			var alarm = Loader.host + '/alarm.mp3';
+			
+            var vol = 50, 
+			audio = new Audio();
+            audio.src = alarm;
+            audio.volume = vol / 100;
+               
+			if( Quasar.config.get("sound_alarm", true) ){
+				window.setInterval( audio.play , 30 * 1000);
+				audio.play();
+			}
 		}
 	},
 	coordinator : {
@@ -1894,10 +1988,6 @@ Quasar = {
 	},
 	dodge : {
 		init : function () {
-			//I think that it is not part of Dodge!
-			if (game_data.player.premium) {
-				this.renameAttacks();
-			}
 
 			if (Quasar.dodge.getStatus() && game_data.player.incomings > 0 && Quasar.dodge.getDodgeVillage() !== null) {
 				this.UI.showAlert();
@@ -1909,6 +1999,11 @@ Quasar = {
 		},
 		//Rename comming attacks
 		renameAttacks : function () {
+			//I think that it is not part of Dodge!
+			if (!game_data.player.premium) {
+				return;
+			}
+
 			//Conta qts ataques estão vindo, se for maior do que o que tinha na ultima vez que renomeou,
 			//renomeia e altera, se for menor, apenas atualiza a lista
 			var atqs = Quasar.config.get("incoming_attacks", 0);
@@ -2847,255 +2942,3 @@ Quasar = {
 		}
 	}
 };
-/*
-	JSON Handle
-*/
-var JSONObject = Class.create({
-	cache: {},/* cache to the true JSON representation */
-	perfectSyntax: true,
-	initialize : function( jsonString ){
-		if( jsonString == null ){
-			this.cache = {};
-		}
-		else { 
-			try{
-				this.cache = JSON.parse( jsonString );
-			} catch( e ){
-				this.cache = {};
-				this.perfectSyntax = false;
-			}
-		}
-	},
-	/* Check if this Object could be load succefully */
-	isValid : function(){
-		return this.perfectSyntax;
-	},
-	/* Setter and Getter for and element*/
-	get : function( key ){
-		if( this.contains( key ) ){
-			return this.cache[ key ];
-		}		
-		return null;
-	},	
-	set : function(key, value ){
-		this.cache[key] = value;
-	},
-	/* remove an element from this Object */
-	remove : function( key ){
-		var newCache = {};
-		
-		for( var elementKey in this.cache){
-			if( elementKey !== key ){
-				newCache[ elementKey ] = this.cache[ elementKey ];
-			}
-		}
-		
-		this.cache = newCache;
-	},
-	/* return this string representation */
-	toString : function () {
-		return JSON.stringify(this.cache);
-	},
-	/* return this pure JSON*/
-	toJSON : function () {
-		return this.cache;
-	},
-	/* Check if an element exist in this Object */
-	contains : function (key) {
-		if (typeof this.cache[key] !== "undefined") {
-			return true;
-		}
-		return false;
-	},
-});
-/*
-	Smart Quasar data storage control
-*/
-var DataControl = Class.create({
-	initialize : function(){		
-		this.playerName = game_data.player.name;
-	},
-	/* Get and Set data from Pulsar data storage structure */
-	get : function (key, def) {
-		var json = new JSONObject( this.loadPlayerData() );
-		if( !json.isValid() ){
-			return def;
-		}
-		var result = json.get( key );
-		return result == null ? def : result;
-	},
-	set : function (key, value) {
-		var json = new JSONObject( this.loadPlayerData() );
-		json.set(key, value);
-		this.savePlayerData( json.toString() );
-	},
-	/* Load and Save data from playerName storage slot */
-	loadPlayerData : function(){
-		return this.getFromStorage( this.playerName );
-	},
-	savePlayerData : function( jsonString ){		
-		this.setFromStorage( this.playerName, jsonString);
-	},
-	/* Get and Set data directly from browser localStorage */
-	getFromStorage : function( keyWord ){
-		return localStorage.getItem( keyWord );
-	},
-	setFromStorage : function( keyWord, value ){
-		localStorage.setItem( keyWord, value );
-	}
-});
-/*
-	Menu Object
-*/
-var Menu = Class.create({
-	itens: [],
-	$element: null,
-	initialize: function() {
-		
-	},
-	addItem: function( menuItem ){
-		this.itens.push( menuItem );
-		return this;
-	},
-	render : function(){
-		this.$element = $('<section class="quasar menu" style="display:none;">');
-		//Passa por cada item do array, criando cada elemento e adicionado a si mesmo
-		for(var i = 0; i < this.itens.length; i++ ){
-			this.$element.append( this.itens[i].render() );
-		}
-		/* Can cast new Menu().render().show() */
-		return this;
-	},
-	show : function(){
-		if( this.$element == null ){
-			throw "Primeiro você precisa executar o methodo render().";
-		} else {
-			$( 'body' ).append( this.$element );
-			this.$element.show();
-		}
-		return this;
-	}
-});
-/*
-	MenuItem interface
-*/
-var MenuItem = Class.create({
-	$element : null,
-	initialize: function( itemText ) {
-		this.itemText = itemText;
-	},
-	getText : function(){
-		return this.itemText;
-	},
-	/* Abstract methods */
-	onClick : function(){},
-	onTooltipActiveRequest : function(){ return null; },
-	render : function(){
-		var $element = $('<div class="menuitem"></div>');
-		$element.append( this.getText() );
-		this.$element = $element;
-		return this.$element;
-	}
-});
-/*
-	PluginMenuItem
-*/
-var PluginMenuItem = Class.create(MenuItem, {
-	plugin : null,
-	initialize: function( itemText, plugin ){
-		this.setPlugin( plugin );
-		this.itemText = itemText;
-	},
-	onClick : function(){
-		this.plugin.toggleEnable();
-	},
-	onTooltipActiveRequest : function(){
-		return "Plugin Menu Item";
-	},
-	setPlugin : function( quasarPlugin ){
-		this.plugin = this;
-	}
-});
-/*
-	Quasar Plugin Interface
-*/
-var QuasarPlugin = Class.create({
-	initialize: function(data_name, lang_string, pages ){
-		this.lang_string = lang_string;
-		this.data_name = data_name;
-		this.pages = pages;
-		
-		this.menuItem = new PluginMenuItem( lang_string, this );
-		console.log("onInitialize", this.menuItem );
-	},
-	getMenuItem : function(){
-		console.log( "getter",this.menuItem );
-		return this.menuItem;
-	},
-	toggleEnable : function(){
-		this.setEnable( !this.isEnable() );
-	},
- 	setEnable : function( status ){
-		var dc = new DataControl();
-		dc.set( this.data_name, status);
-		
-		if( status ){
-			this.menuItem.$element.addClass("active");
-		} else {
-			this.menuItem.$element.removeClass("active");
-		}
-	},
-	isEnable : function(){
-		var dc = new DataControl();
-		return dc.get(this.data_name, false);
-	},
-	pre_execute : function( current_page_url ){
-		for(var page in this.pages ){
-			if( current_page_url.indexOf( page ) > -1 ){
-				this.pageInjection();
-				this.execute();
-				break;
-			}
-		}
-	},
-	/* Abstract methods */
-	execute : function(){},
-	pageInjection: function(){}
-});
-
-var Farmador = Class.create(QuasarPlugin, {
-	initialize : function(){
-		arguments.callee.$super("farmer", "farmer", null);
-	},
-	pre_execute : function( url ){
-		if( game_data.screen == 'place' ){
-			this.execute();
-		}
-	},
-	execute : function(){
-		console.log( "Farmador sendo executado." );
-	}
-});
-
-
-//Start the Plugins
-var plugins = [];
-plugins.push( new Farmador() );
-
-var menu = new Menu();
-
-//Add each plugins in menu
-for( var i in plugins ){
-	console.log("Plugin: ", plugins[i]);
-	menu.addItem( plugins[i].getMenuItem() );
-}
-
-//Render and show the mainMenu
-menu.render().show();
-
-
-var url = location.href;
-// Execute each loaded plugin
-for(var i in plugins ){
-	plugins[i].pre_execute( url );
-}
