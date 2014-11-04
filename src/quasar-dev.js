@@ -380,8 +380,8 @@ Quasar = {
 				html += '<div id="tabs">';
 				html += '<ul>';
 				html += '<li><a href="#tab-geral">Geral</a></li>';
-				html += '<li><a href="#tab-as">Assistente de saque</a></li>';
-				html += '<li><a href="#tab-wall">Derrubador de muralhas</a></li>';
+				html += '<li><a href="#tab-as">Auto AS</a></li>';
+				html += '<li><a href="#tab-wall">Muralha</a></li>';
 				html += '</ul>';			
 				
 				
@@ -398,13 +398,13 @@ Quasar = {
 				html += '<tr><th>Descrição</th><th>Valor</th></tr>';
 				html += '<tr><td colspan="2"><strong>Geral</strong></td></tr>';
 				html += '<tr><td>Linguagem: </td><td>'+ select +'</td></tr>';
-				html += '<tr><td>Tempo minimo para operaçoes aleatorias: </td><td><input type="text" id="min_rand" size="2" value="' + Quasar.config.get("min_rand", 300) + '"/>segundos</td></tr>';
-				html += '<tr><td>Tempo maximo para operações aleatorias: </td><td><input type="text" id="max_rand" size="2" value="' + Quasar.config.get("max_rand", 900) + '"/>segundos</td></tr>';
-				html += '<tr><td>Tempo maximo de recrutamento: </td><td><input type="text" id="max_recruit_time" size="2" value="' + Quasar.config.get("max_recruit_time", 8) + '"/> horas</td></tr>';
-				html += '<tr><td>Quantidade maxima de edificios na fila: </td><td><input type="text" id="max_build_queue" size="2" value="' + Quasar.config.get("max_build_queue", (premium ? 5 : 2)) + '"/></td></tr>';
-				html += '<tr><td>Parar de farmar ao chegar no fim da lista: </td><td><input type="checkbox" id="stop_end_farm" ' + (Quasar.config.get("stop_end_farm", false) ? "checked" : "") + '/></td></tr>';
-				html += '<tr><td>Tocar um alarm quando aparecer um Captcha: </td><td><input type="checkbox" id="sound_alarm" ' + (Quasar.config.get("sound_alarm", true) ? "checked" : "") + '/></td></tr>';
-				html += '<tr><td>Alvo para dodge: </td><td><input type="text" placeholder="123|456" id="dodge_target" size="3" value="' + Quasar.config.get("dodge_target", "") + '"/></td></tr>';
+				html += '<tr><td><span title="Define o tempo minimo em que o sistema gera o temporalizador aleatorio.">Tempo minimo para o temporalizador: </span></td><td><input type="text" id="min_rand" size="2" value="' + Quasar.config.get("min_rand", 300) + '"/>segundos</td></tr>';
+				html += '<tr><td><span title="Define o tempo maximo em que o sistema gera o temporalizador aleatorio.">Tempo maximo para o temporalizador: </span></td><td><input type="text" id="max_rand" size="2" value="' + Quasar.config.get("max_rand", 900) + '"/>segundos</td></tr>';
+				html += '<tr><td><span title="Define o tempo maximo da fila de recrutamento do Recrutador. Caso a fila esteja maior que esse limite, ele não irá recrutar.">Tempo maximo de recrutamento: </span></td><td><input type="text" id="max_recruit_time" size="2" value="' + Quasar.config.get("max_recruit_time", 8) + '"/> horas</td></tr>';
+				html += '<tr><td><span title="Define a quantidade maxima de edificios que serão colocados na fila de recrutamento ao mesmo tempo.">Quantidade maxima de edificios na fila: </span></td><td><input type="text" id="max_build_queue" size="2" value="' + Quasar.config.get("max_build_queue", (premium ? 5 : 2)) + '"/></td></tr>';
+				html += '<tr><td><span title="Usando o Farmador, deseja parar de farmar assim que estiver no final da lista de coordenadas?">Parar de farmar ao chegar no fim da lista: </span></td><td><input type="checkbox" id="stop_end_farm" ' + (Quasar.config.get("stop_end_farm", false) ? "checked" : "") + '/></td></tr>';
+				html += '<tr><td>Tocar alarm quando aparecer um Captcha: </td><td><input type="checkbox" id="sound_alarm" ' + (Quasar.config.get("sound_alarm", true) ? "checked" : "") + '/></td></tr>';
+				html += '<tr><td><span title="Define alvo para o dodge. O Dodge funciona apenas com uma aldeia.">Alvo para dodge: </span></td><td><input type="text" placeholder="123|456" id="dodge_target" size="3" value="' + Quasar.config.get("dodge_target", "") + '"/></td></tr>';
 				html += '</tbody></table>';
 				html += '</div>';
 				
@@ -412,16 +412,16 @@ Quasar = {
 				html += '<table class="vis" style="width:100%"><tbody>';
 				html += '<tr><th>Descrição</th><th>Valor</th></tr>';
 				html += '<tr><td colspan="2"><strong>Assistente de Saque</strong></td></tr>';
-				html += '<tr><td><span title="Limita a distancia maxima a enviar um ataque.">Distancia de ataques maxima:</span></td><td><input type="text" id="max_am_dis" size="2" value="' + Quasar.config.get("max_am_dis", 20) + '"/>campos</td></tr>';
-				html += '<tr><td><span title="Limita a quantidade de ataques que podem ser enviados a uma aldeia baseando-se na distancia.">Usar sistema de razão?</span></td><td><input type="checkbox" id="am_is_by_ratio" ' + (Quasar.config.get("am_is_by_ratio", false) ? "checked" : "") + '/></td></tr>';
-				html += '<tr><td><span title="Quantidade de ataque para cada campo de distancia. Se configurado como 1, vai enviar 1 ataque para cada campo entre o alvo e a aldeia atual. (precisa que \"Usar sistema de razão\" esteja ativo)">Ataque por campo: </span></td><td><input type="text" id="am_dis_ratio" size="2" value="' + Quasar.config.get("am_dis_ratio", 1) + '"/>(Ex: 0.2)</td></tr>';
-				html += '<tr><td><span title="O controlador de ataques prioriza atacar aldeias que tenham menos ataques a caminho, isso previne que as primeiras aldeias da pagina tenham muitos ataques enquanto outras da mesma pagina não tenhão nenhum.">Usar controlador de ataques? </span></td><td><input type="checkbox" id="attack_control" ' + (Quasar.config.get("attack_control", false) ? "checked" : "") + '/></td></tr>';
-				html += '<tr><td><span title="Configura uma quantidade maxima de ataques a uma aldeia. (Funciona somente se \"Usar sistema de razão\" estiver desabilitado.)">Quantidade maxima de ataques: </span></td><td><input type="text" id="max_am_attacks" size="2" value="' + Quasar.config.get("max_am_attacks", 2) + '"/></td></tr>';
-				html += '<tr><td><span title="Configura o nivel maximo de muralha permitido para um ataque.">Nivel maximo de muralha:</span></td><td><input type="text" id="max_am_wall" size="2" value="' + Quasar.config.get("max_am_wall", 3) + '"/></td></tr>';
-				html += '<tr><td><span title="Permite atacar aldeias cujo o ultimo relatorio foi azuis.">Atacar relatorios azuis?: </span></td><td><input type="checkbox" id="blue_reports" ' + (Quasar.config.get("blue_reports", false) ? "checked" : "") + '/></td></tr>';
-				html += '<tr><td><span title="Move os relatorios amarelho para o derrubador de muralha.">Mover relatorios amarelho?</span></td><td><input type="checkbox" id="yellow_reports" ' + (Quasar.config.get("yellow_reports", true) ? "checked" : "") + '/></td></tr>';
-				html += '<tr><td><span title="Enviar ataque usando o templace C (Somente se a soma dos recursos for maior que 1000)">Usar o templace C?:</span></td><td><input type="checkbox" id="use_c_am" ' + (Quasar.config.get("use_c_am", true) ? "checked" : "") + '/></td></tr>';
-				html += '<tr><td><span title="Deleta relatorios que já ultrapassaram o limite de ataques(Libera espaço para que aldeias que ainda nao foram atacadas apareçam na pagina)">Deletar relatorios acima do limite?:</span></td><td><input type="checkbox" id="delete_most_attacked" ' + (Quasar.config.get("delete_most_attacked", false) ? "checked" : "") + '/></td></tr>';
+				html += '<tr><td><span title="Define a distancia maxima em que o Auto AS enviará um ataques.">Distancia de ataques maxima:</span></td><td><input type="text" id="max_am_dis" size="2" value="' + Quasar.config.get("max_am_dis", 20) + '"/>campos</td></tr>';
+				html += '<tr><td><span title="Deseja que o Auto AS defina automaticamente quantos ataques pode ser enviado a uma aldeia baseado em sua distancia?">Usar sistema de razão?</span></td><td><input type="checkbox" id="am_is_by_ratio" ' + (Quasar.config.get("am_is_by_ratio", false) ? "checked" : "") + '/></td></tr>';
+				html += '<tr><td><span title="Define quantos ataques podem ser enviados para cada campo de distancia. Pode ser um valor decimal ou inteiro.">Ataque por campo: </span></td><td><input type="text" id="am_dis_ratio" size="2" value="' + Quasar.config.get("am_dis_ratio", 1) + '"/>(Ex: 0.2)</td></tr>';
+				html += '<tr><td><span title="Deseja que o Auto AS priorize a atacar aldeias que tenham menos ataques a caminho?">Usar controlador de ataques? </span></td><td><input type="checkbox" id="attack_control" ' + (Quasar.config.get("attack_control", false) ? "checked" : "") + '/></td></tr>';
+				html += '<tr><td><span title="Define a quantidade maximas de ataques que serão enviadas a uma unica aldeia.">Quantidade maxima de ataques: </span></td><td><input type="text" id="max_am_attacks" size="2" value="' + Quasar.config.get("max_am_attacks", 2) + '"/></td></tr>';
+				html += '<tr><td><span title="Define o nivel maximo de muralha aceito para que seja atacado.">Nivel maximo de muralha:</span></td><td><input type="text" id="max_am_wall" size="2" value="' + Quasar.config.get("max_am_wall", 3) + '"/></td></tr>';
+				html += '<tr><td><span title="Deseja atacar aldeias cujo o ultimo relatorio foi de exploração?">Atacar relatorios de exploração? </span></td><td><input type="checkbox" id="blue_reports" ' + (Quasar.config.get("blue_reports", false) ? "checked" : "") + '/></td></tr>';
+				html += '<tr><td><span title="Deseja que o Auto AS adicione automaticamente relatorios amarelos ou em que a muralha seja maior que o limite para a lista de aldeias em que a muralha deve ser derrubada?">Adicionar ao Derrubador de Muralhas?</span></td><td><input type="checkbox" id="yellow_reports" ' + (Quasar.config.get("yellow_reports", true) ? "checked" : "") + '/></td></tr>';
+				html += '<tr><td><span title="Deseja que o Auto AS use o Template C para farma? Só são atacadas aldeias em que a soma dos recursos é maior que 1000.">Usar o templace C?:</span></td><td><input type="checkbox" id="use_c_am" ' + (Quasar.config.get("use_c_am", true) ? "checked" : "") + '/></td></tr>';
+				html += '<tr><td><span title="Deseja deletar aldeias em que o limite de ataques simultaneos já foi atingido? Isso libera mais espaço na pagina do AS.">Deletar ataques acima do limite?:</span></td><td><input type="checkbox" id="delete_most_attacked" ' + (Quasar.config.get("delete_most_attacked", false) ? "checked" : "") + '/></td></tr>';
 				html += '</tbody></table>';
 				html += '</div>';
 				
@@ -707,6 +707,50 @@ Quasar = {
 					UI.SuccessMessage(build + " removido do construtor.");
 				});
 			}
+		},
+		coordinator : {
+			start : function(){
+				var table = '';
+					table += '<table class="vis" width="300">';
+					table += '<tbody>';
+					table += '<tr>';
+						table += '<th colspan="2">';
+						table += 'Coordenador';
+						table += '</th>';
+					table += '</tr>';
+					
+					table += '<tr>';
+					table += '<td></td>';
+					table += '<td></td>';
+					table += '</tr>';
+					
+					table += '<tr>';
+					table += '<td></td>';
+					table += '<td></td>';
+					table += '</tr>';
+					
+					table += '<tr>';
+					table += '<td></td>';
+					table += '<td></td>';
+					table += '</tr>';
+					
+					table += '<tr>';
+					table += '<td></td>';
+					table += '<td></td>';
+					table += '</tr>';
+					
+					table += '<tr>';
+					table += '<td></td>';
+					table += '<td></td>';
+					table += '</tr>';
+					
+					table += '</tbody>';
+					table += '</table>';
+			
+				var $table = $( table );
+				
+				$("#command-confirm-form").find("table:eq(0)").after( $table );
+			}
 		}
 	},
 	/*
@@ -937,33 +981,7 @@ Quasar = {
 	},
 	coordinator : {
 		init : function () {
-			this.UI.init();
-		},
-		UI : {
-			init : function () {
-				var $timer = $('<span style="display: none">00:00:00</span>');
-				var $hours = $('<input type="text" value="00" maxlength="2" size="2">');
-				var $minutes = $('<input type="text" value="00" maxlength="2" size="2">');
-				var $seconds = $('<input type="text" value="00" maxlength="2" size="2">');
-				var $mileseconds = $('<input type="text" value="000" maxlength="3" size="3">');
-				var $button = $('<input type="button" value="Coordenar">');
-
-				var $panel = $("<div></div>");
-
-				$panel.append($hours);
-				$panel.append($minutes);
-				$panel.append($seconds);
-				$panel.append($mileseconds);
-				$panel.append($button);
-
-				var $container = $("#command-confirm-form");
-				$container.append($timer);
-				$container.append($panel);
-
-				$button.on("click", function () {
-					Quasar.coordinator.startTimer($hours, $minutes, $seconds, $mileseconds, $timer, $panel);
-				});
-			}
+			Quasar.interface.coordinator.start();
 		},
 		startTimer : function ($hours, $minutes, $seconds, $mileseconds, $timer, $panel) {
 
@@ -987,6 +1005,9 @@ Quasar = {
 				console.log("Attacked");
 				$('#troop_confirm_go').click();
 			}, schedule.getTime() - serverTime.getTime());
+		},
+		createSchedule : function( timeJSON ){
+			
 		},
 		getStatus : function () {
 			return Quasar.config.get("coordinator", false);

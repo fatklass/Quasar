@@ -20,13 +20,14 @@ module.exports = function (grunt) {
 					banner : '/* Minified <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */'
 				},
 				files : {
-					'build/quasar.min.css' : ['src/**/*.css']
+					'build/quasar.min.css' : ['src/**/*.css'],
+					'C:/Users/Wesley Nascimento/Dropbox/public/quasar_beta/quasar.min.css' : ['src/**/*.css']
 				}
 			}
 		},
 		watch : {
 			scripts : {
-				files : ['src/**/*.js', 'lib/**/*.js'],
+				files : ['src/**/*.js', 'lib/**/*.js', 'src/**/*.css', 'lib/**/*.css'],
 				tasks : ['concat', 'uglify', 'cssmin'],
 				options : {
 					spawn : false,

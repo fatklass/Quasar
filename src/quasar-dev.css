@@ -237,3 +237,40 @@
 	border-radius: 25%;
 	box-shadow: 0 0 1px #333;
 }
+#tabs ul{
+	padding: .2em .2em 0;
+	border: 1px solid #7d510f;
+	background: #c1a264 !important;
+	content: "";
+	clear: both;
+	display: table;
+}
+
+#tabs li{
+	list-style: none;
+	float: left;
+	position: relative;
+	top: 0;
+	margin: 1px .2em 0 0;
+	border-bottom-width: 0;
+	padding: 0;
+	white-space: nowrap;
+	
+	margin-bottom: -1px;
+	padding-bottom: 1px;
+	padding: .5em 1em;
+}
+
+#tabs .ui-state-active{
+	cursor: pointer;
+	background: linear-gradient(to bottom, #947a62 0%,#7b5c3d 22%,#6c4824 30%,#6c4824 100%);
+	border-top-left-radius: 4px;
+	border-top-right-radius: 4px;
+	border: 1px solid #000;
+	color: #fff !important;
+	white-space: nowrap;
+}
+
+#tabs .ui-state-active a {
+	color: #fff !important;
+}
