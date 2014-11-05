@@ -749,7 +749,10 @@ Quasar = {
 					Quasar.main.order();
 				});
 
-				$("#build_script").fadeTo(1000, 1);
+				$("#build_script").fadeTo(1000, 1);			
+				
+			},
+			addBuildIcon : function(){
 				$("#img_addBuild img").on('click', function () {
 					var queue = Quasar.config.get("queue_" + game_data.village.id, []),
 					build = $(this).attr("data-ed").replace("main_buildrow_", ""),
@@ -854,7 +857,7 @@ Quasar = {
 		coordinator : {
 			start : function(){
 				var table = '';
-					table += '<table class="vis" width="300">';
+					table += '<table class="vis" width="327" id="coordinator_table">';
 					table += '<tbody>';
 					table += '<tr>';
 						table += '<th colspan="2">';
@@ -863,36 +866,104 @@ Quasar = {
 					table += '</tr>';
 					
 					table += '<tr>';
-					table += '<td></td>';
-					table += '<td></td>';
+					table += '<td>Data e Horario:</td>';
+					table += '<td>'
+					table += '<span id="preview" style="display: none">' + Quasar.coordinator.TIMESTAMP_FORMAT() + '</span>';
+					table += '<input type="text" id="edit">';
+					table += '<a href="#" id="toggle"><img src="graphic/rename.png?1" alt="umbenennen" title="umbenennen"></a>';
+					table += '</td>';
 					table += '</tr>';
 					
 					table += '<tr>';
-					table += '<td></td>';
-					table += '<td></td>';
+					table += '<td><span title="Determine se o horario é o de envio ou de chegada do ataque.">Tipo de envio:<span></td>';
+					
+					var select = '<select id="type_sched">';
+					select += '<option value="0">Hora de chegada</option>';
+					select += '<option value="1">Hora de envio</option>';
+					select += '</select>'; 
+					
+					table += '<td>' + select + '</td>';
 					table += '</tr>';
 					
 					table += '<tr>';
-					table += '<td></td>';
-					table += '<td></td>';
+					table += '<td colspan="2"><span title="Deseja que o Coordenador calcule o delay de sua internet para aumentar a precisão dp ataques?">Usar ping atual como base de envio?<span></td>';
 					table += '</tr>';
 					
 					table += '<tr>';
-					table += '<td></td>';
-					table += '<td></td>';
+					table += '<td colspan="2"><span title="Deseja que o Coordenador mantenha esse ataques como prioridade? Ou seja, case seja um NT esse ataque vai ser o primeiro a ser enviado.">Enviar como prioridade?<span></td>';
 					table += '</tr>';
 					
 					table += '<tr>';
-					table += '<td></td>';
-					table += '<td></td>';
+					table += '<td>Contagem: </td>';
+					table += '<td><span id="countDown_attack">00:00:00</span></td>';
 					table += '</tr>';
 					
 					table += '</tbody>';
 					table += '</table>';
 			
 				var $table = $( table );
+				var $button = $('<input type="button" class="btn btn-attack" value="Coordenar Envio">');
 				
-				$("#command-confirm-form").find("table:eq(0)").after( $table );
+				var $form = $("#command-confirm-form");	
+				$form.find("table:eq(0)").after( $table );				
+				$form.append( $button );
+				
+				//Cache all jQuery elements
+				var $toggle = $("#toggle"),
+					$preview = $("#preview"),
+					$edit = $("#edit");
+				
+				//bind events
+				$toggle.on("click", function(){
+					if( $edit.is( ":visible" ) ){
+						$edit.hide();
+						$preview.show();
+						//Set up type
+						Quasar.coordinator.type = 0;
+					} else {
+						$edit.show();
+						$preview.hide();
+					}
+				});
+				
+				var duration = $form.find("table:eq(0) tr:eq(2) td:eq(1)").text();
+								
+				$button.on("click", function(){					
+					var json = {
+						time: $("#edit").val(),
+						type: $("#type_sched").val(),
+						duration: duration,
+					};
+					Quasar.coordinator.createSchedule( json );
+				});
+
+				$("#coordinator_table").tooltip({ 
+					position: { 
+						my: "left+15 center", 
+						at: "right center",
+						using: function( position, feedback ) {
+							var $this = $( this );							
+							$this.css( position );
+							$this.css("z-index", 100000);
+						}						
+					},
+					tooltipClass: "tooltip-style",
+					track: true
+				});
+				
+				//get the picker
+				$.getScript( Loader.host + '/jquery.datetimepicker.js', function() {
+					var picker = {
+						value: Quasar.coordinator.TIMESTAMP_FORMAT(),
+						format: 'H:i:s d/m/Y',
+						formatDate: 'd/m/Y',
+						formatTime: 'H:i:s',
+						minDate: 0,
+						step: 5
+					};
+					
+					$("#edit").datetimepicker(picker);
+				});
 			}
 		}
 	},
@@ -1149,9 +1220,46 @@ Quasar = {
 				$('#troop_confirm_go').click();
 			}, schedule.getTime() - serverTime.getTime());
 		},
-		createSchedule : function( timeJSON ){
-			
+		createSchedule : function( json ){
+			console.log( json.time );
+			console.log( json.type );
+			console.log( json.duration );
 		},
+		currentTime : function(){
+			$sd = $( '#serverDate' );
+			$st = $( '#serverTime' );
+			var date = $sd.text().split( '/' );			
+			return ( new Date( date[ 1 ] + '/' + date[ 0 ] + '/' + date[ 2 ] + ' ' + $st.text() ) ).getTime();
+		},
+		TIMESTAMP_FORMAT : function( long_time ){
+			if( !long_time ){
+				long_time = this.currentTime();
+			}
+			
+			var date = new Date( long_time );
+			var hour = date.getHours();
+			var min = date.getMinutes();
+			var sec = date.getSeconds();
+			var day = date.getDate();
+			var month = date.getMonth() + 1;
+			var year = date.getFullYear();
+			
+			hour = hour < 10 ? '0' + hour : hour;
+			min = min < 10 ? '0' + min : min;
+			sec = sec < 10 ? '0' + sec : sec;
+			day = day < 10 ? '0' + day : day;
+			month = month < 10 ? '0' + month : month;
+			
+			return hour + ':' + min + ':' + sec + ' ' + day + '/' + month + '/' + year;
+		},
+		FORMAT_TIMESTAMP : function( time ) {
+			
+			var data = time.split( ' ' );
+			var date = data[ 1 ].split( '/' );
+					time = data[ 0 ];
+			
+			return new Date( date[ 1 ] + '/' + date[ 0 ] + '/' + date[ 2 ] + ' ' + time ).getTime();
+		},		
 		getStatus : function () {
 			return Quasar.config.get("coordinator", false);
 		},
@@ -1162,24 +1270,26 @@ Quasar = {
 	main : {
 		niveis : {},
 		init : function () {
-			Quasar.interface.ed_principal.start();
-			var get = Quasar.game.builds;
-			this.load();
-
-			//Not working
+			Quasar.interface.ed_principal.start();			
+			
 			var update_all = BuildingMain.update_all;
 			BuildingMain.update_all = function (data) {
 				update_all(data);
 				console.log("Building Update event");
-				Quasar.interface.ed_principal.start();
+				Quasar.main.start();
 			};
-
-			if (this.getStatus()) {
-				this.build();
-			}
+			this.start();
+			
 			Quasar.utils.setReload("&screen=main");
 		},
+		start : function(){
+			Quasar.interface.ed_principal.addBuildIcon();
+			this.load();
+			this.build()
+		},
 		build : function () {
+			if( !Quasar.main.getStatus() ) return;
+			
 			var queue = Quasar.config.get("queue_" + game_data.village.id, []);
 
 			if (queue.length > 0) {
