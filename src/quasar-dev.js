@@ -5,7 +5,7 @@
 
 Quasar = {
 	config : {
-		version : "2.2.2805",
+		version : "2.3.2805",
 		name : "Quasar",
 		author : "Wesley Nascimento",
 		/* Metodos de armazenamento */
@@ -764,7 +764,16 @@ Quasar = {
 					$edit = $("#edit"),
 					$type = $("#type_sched");
 				
-				var duration = $form.find("table:eq(0) tr:eq(2) td:eq(1)").text();
+				var duration = 0;
+				
+				//Se tiver 8 tds, a duração está na segunda td
+				if( $form.find("table:eq(0) tr").length == 8 ){
+					duration = $form.find("table:eq(0) tr:eq(2) td:eq(1)").text();
+				}
+				//Se tiver 9 tds, a duração está na terceira td
+				else if( $form.find("table:eq(0) tr").length == 9 ){
+					duration = $form.find("table:eq(0) tr:eq(3) td:eq(1)").text();
+				}
 
 				$button.on("click", function () {
 					var $this = $(this);
@@ -1092,7 +1101,11 @@ Quasar = {
 				cmd_time = time;
 			}
 			//Se o tipo de ataque for hora de chegada
-			else if( json.type == 1 ){
+			else if( json.type == 1 ){			
+				if( duration == 0 ){
+					UI.ErrorMessage("Não foi possivel encontrar a duração do ataque.");
+					return fail;
+				}
 				cmd_time = time - duration;
 			}
 			
@@ -1107,7 +1120,6 @@ Quasar = {
 				UI.ErrorMessage("O horario de envio já passou! " + this.TIMESTAMP_FORMAT( cmd_time ), 5000);
 				return fail;
 			}			
-			
 			var freetime = cmd_time - this.currentTime();
 
 			if ( freetime >= 2147483648 ) {
