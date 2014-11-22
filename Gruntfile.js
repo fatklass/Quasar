@@ -9,8 +9,7 @@ module.exports = function (grunt) {
 			},
 			my_target : {
 				files : {
-					'build/quasar.min.js' : ['build/quasar.js'],
-					'C:/Users/Wesley Nascimento/Dropbox/public/quasar_beta/quasar.min.js' : ['build/quasar.js']
+					'build/quasar.min.js' : ['build/quasar.js']
 				}
 			}
 		},
@@ -20,8 +19,7 @@ module.exports = function (grunt) {
 					banner : '/* Minified <%= pkg.name %> <%= grunt.template.today("yyyy-mm-dd") %> */'
 				},
 				files : {
-					'build/quasar.min.css' : ['src/**/*.css'],
-					'C:/Users/Wesley Nascimento/Dropbox/public/quasar_beta/quasar.min.css' : ['src/**/*.css']
+					'build/quasar.min.css' : ['src/**/*.css']
 				}
 			}
 		},
