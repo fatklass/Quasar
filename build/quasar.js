@@ -907,16 +907,17 @@ Quasar = {
 					$edit = $("#edit"),
 					$type = $("#type_sched");
 				
-				var duration = 0;
+				var duration = "00:00:00";
 				
-				//Se tiver 8 tds, a duração está na segunda td
-				if( $form.find("table:eq(0) tr").length == 8 ){
-					duration = $form.find("table:eq(0) tr:eq(2) td:eq(1)").text();
-				}
-				//Se tiver 9 tds, a duração está na terceira td
-				else if( $form.find("table:eq(0) tr").length == 9 ){
-					duration = $form.find("table:eq(0) tr:eq(3) td:eq(1)").text();
-				}
+				$form.find("table:eq(0) tr").each(function(){
+					var $this = $(this),
+						$td0 = $this.find("td:eq(0)").text(),
+						$td1 = $this.find("td:eq(1)").text();
+					
+					if( $td0 == "Duração:" ){
+						duration = $td1;
+					}
+				});
 
 				$button.on("click", function () {
 					var $this = $(this);
@@ -1207,29 +1208,6 @@ Quasar = {
 		init : function () {
 			Quasar.interface.coordinator.start();
 		},
-		startTimer : function ($hours, $minutes, $seconds, $mileseconds, $timer, $panel) {
-
-			if (!Quasar.utils.IsNumeric($hours.val()) || !Quasar.utils.IsNumeric($minutes.val()) || !Quasar.utils.IsNumeric($seconds.val()) || !Quasar.utils.IsNumeric($mileseconds.val())) {
-				alert("Erro no formato do texto");
-				return;
-			}
-
-			var serverTime = new Date();
-			var schedule = new Date();
-			schedule.setMilliseconds($mileseconds.val());
-			schedule.setMinutes($minutes.val());
-			schedule.setSeconds($seconds.val());
-			schedule.setHours($hours.val());
-
-			$timer.text(schedule.toTimeString());
-			$timer.show();
-			$panel.hide();
-
-			setTimeout(function () {
-				console.log("Attacked");
-				$('#troop_confirm_go').click();
-			}, schedule.getTime() - serverTime.getTime());
-		},
 		createSchedule : function (json) {
 			var time = this.FORMAT_TIMESTAMP(json.time);
 			var duration = this.TIME_TO_MILLESECONDS(json.duration);
@@ -1246,7 +1224,7 @@ Quasar = {
 			//Se o tipo de ataque for hora de chegada
 			else if( json.type == 1 ){			
 				if( duration == 0 ){
-					UI.ErrorMessage("Não foi possivel encontrar a duração do ataque.");
+					UI.ErrorMessage("Não foi possivel encontrar a duração do ataque.", 5000);
 					return fail;
 				}
 				cmd_time = time - duration;
@@ -1275,7 +1253,7 @@ Quasar = {
 				$element.click();
 			}, freetime);
 			
-			UI.SuccessMessage("Ataque agendado com sucesso! Mantenha essa aba do navegador aberta.");
+			UI.SuccessMessage("Ataque agendado com sucesso! Mantenha essa aba do navegador aberta.", 5000);
 			var result = {
 				status : true,
 				cmd_time : {
